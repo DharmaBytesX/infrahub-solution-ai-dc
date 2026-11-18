@@ -43,6 +43,7 @@ on:
   push:
     branches:
       - main
+      - test/sandbox-e2e
     paths:
       - "Dockerfile"
       - ".dockerignore"
@@ -235,6 +236,7 @@ jobs:
     name: "Build ${{ matrix.edition.name }} (${{ matrix.platform }})"
     needs: [plan, test-build]
     if: ${{ needs.plan.outputs.publish == 'true' }}
+    environment: harbor-e2e
     runs-on: ${{ matrix.platform == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
     timeout-minutes: 30
     strategy:
@@ -290,6 +292,7 @@ jobs:
   merge:
     name: "Publish the ${{ matrix.edition.name }} multi-architecture manifest"
     needs: [plan, build]
+    environment: harbor-e2e
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     strategy:
@@ -356,6 +359,7 @@ jobs:
   sign:
     name: "Sign and attach SBOM to ${{ matrix.edition.name }}"
     needs: [plan, merge]
+    environment: harbor-e2e
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
